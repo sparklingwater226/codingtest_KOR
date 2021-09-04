@@ -1,19 +1,19 @@
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef } from 'react'
 import MaterialTable, { MTableToolbar } from 'material-table'
 import { useSelector, useDispatch } from 'react-redux';
-import { setColumns, addCart } from '../Modules/actions';
+import { removeCart } from '../Modules/actions';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import FirstPage from '@material-ui/icons/FirstPage';
 import LastPage from '@material-ui/icons/LastPage';
-import Filter from "../Components/Filter";
+import styled from 'styled-components'
 import Body from "../Components/Body";
 import Header from "../Components/Header"
-import styled from 'styled-components'
+import Total from "../Components/Total"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-const BeerListBody = styled(Body)`
+const ShoppingCartBody = styled(Body)`
   display: block;
 `
 
@@ -31,9 +31,16 @@ const StyledToolbar = styled.div`
   }
 `
 
-const BeerList = () => {
+const cartColumnList = [
+    {field: 'image_url', title: 'Image',  render: rowData => <img src={rowData.image_url} alt={rowData.name} style={{width: 50}}/>},
+    {field: 'name', title: 'This Beer Is'},
+    {field: 'price', title: 'Price',  render: rowData => new Intl.NumberFormat('kr-KR', { style: 'currency', currency: 'KRW' }).format(rowData.price)},
+    {field: 'quantity', title: 'QTY', type: 'numeric'}
+  ]
+
+const ShoppingCart = () => {
   const dispatch = useDispatch();
-  const { beerList, columnList } = useSelector(state => state);
+  const { cartItems } = useSelector(state => state);
   const tableIcons = {
     DetailPanel: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
     FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
@@ -41,68 +48,64 @@ const BeerList = () => {
     NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
     PreviousPage: forwardRef((props, ref) => <ChevronLeft {...props} ref={ref} />),
   };
-  const [displayList, setDisplayList] = useState(beerList);
-  const [filter, setFilter] = useState([]);
-  
-  const handleColumnDrag = (sourceIndex, destinationIndex) => {
-    const newColumnList = columnList;
-    const moved = newColumnList[sourceIndex];
-    newColumnList.splice(sourceIndex, 1);
-    newColumnList.splice(destinationIndex, 0, moved);
 
-    dispatch(setColumns(newColumnList));
-  }
-  
   return (
-    <BeerListBody>
+    <ShoppingCartBody>
       <Header />
       <MaterialTable
           icons={tableIcons}
-          columns={columnList}
-          data={displayList}
-          title="BREWDOG DIY DOG"
-          onColumnDragged={handleColumnDrag}
+          columns={cartColumnList}
+          data={cartItems}
+          title="Shopping Cart"
           options={{
             sorting: false,
             search: false,
             headerStyle: {
-              backgroundColor: 'transparent'
-            }
+              backgroundColor: 'transparent',
+              color: 'white',
+              fontSize: '1rem',
+              fontFamily: 'Nanum Gothic'
+            },
+            draggable: false,
+            
           }}
           components={{
             Action: props => (
-              <FontAwesomeIcon icon={faCartPlus} className='fa-lg'
+              <FontAwesomeIcon icon={faTimes} className='fa-lg'
               onClick={(event) => props.action.onClick(event, props.data)}/>
+            ),
+            Pagination: props => (
+              <Total />
             ),
             Toolbar: props => (
               <StyledToolbar>
                 <MTableToolbar {...props} />
-                <Filter 
-                  setDisplayList={setDisplayList}
-                  setFilter={setFilter}
-                  filter={filter}
-                />
               </StyledToolbar>
-            ),
+            )
           }}
           style={{
             backgroundColor: 'transparent',
-            padding: '20px 50px'
+            padding: '20px 50px',
+            boxShadow: 'none'
           }}
           actions={[
             {
               icon: 'save',
-              tooltip: 'Add to cart',
-              onClick: (event, rowData) => {
-                const { image_url, name } = rowData;
-                const addCartItem = { image_url, name, price: 10000, quantity: 1};
-                dispatch(addCart(addCartItem));
-              }
+              tooltip: 'Delete from cart',
+              onClick: (event, rowData) => dispatch(removeCart(rowData.name))
             }
           ]}
+          localization={{
+            header: {
+              actions: ''
+            },
+            body: {
+              emptyDataSourceMessage: 'Your cart is empty'
+            }
+          }}
         />
-    </BeerListBody>
+    </ShoppingCartBody>
   )
 }
 
-export default BeerList
+export default ShoppingCart

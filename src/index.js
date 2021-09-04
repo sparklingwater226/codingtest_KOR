@@ -7,6 +7,7 @@ import { rootSaga } from "./Modules";
 import createSagaMiddleware from "redux-saga";
 import { createStore, applyMiddleware, compose } from "redux";
 import logger from 'redux-logger';
+import styled, { createGlobalStyle } from 'styled-components'
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -23,8 +24,36 @@ export const store = createStore(
 
 sagaMiddleware.run(rootSaga);
 
+const GlobalStyle = createGlobalStyle`
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 14px;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+  }
+  
+  html, body, #root {
+    height: 100%;
+    background-color: black;
+    overflow: scroll;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+  }
+
+  button:hover, svg:hover, svg *:hover {
+    cursor: pointer;
+  }
+`
+
 ReactDOM.render(
   <Provider store={store}>
+    <GlobalStyle />
     <Routes />
   </Provider>
   ,
