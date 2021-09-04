@@ -61,7 +61,7 @@ export default function SimpleModal({ rowData }) {
   const body = (
     <StyledModal>
       <StyledModalRow title>{rowData.name}</StyledModalRow>
-      <StyledModalRow title sub>{`\"${rowData.tagline}\"`}</StyledModalRow>
+      <StyledModalRow title sub>{`"${rowData.tagline}"`}</StyledModalRow>
       <StyledModalRow title desc>{rowData.description}</StyledModalRow>
       <StyledModalRow>
         <ModalDescription header={'Brewer\'s Tips'} description={rowData.brewers_tips} />

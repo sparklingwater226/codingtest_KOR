@@ -7,7 +7,7 @@ import { rootSaga } from "./Modules";
 import createSagaMiddleware from "redux-saga";
 import { createStore, applyMiddleware, compose } from "redux";
 import logger from 'redux-logger';
-import styled, { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle } from 'styled-components'
 
 const sagaMiddleware = createSagaMiddleware();
 
